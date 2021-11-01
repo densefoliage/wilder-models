@@ -51,6 +51,16 @@ public class HexMap : MonoBehaviour
                 */
                 hexGO.GetComponent<HexComponent>().Hex = h;
                 hexGO.GetComponent<HexComponent>().HexMap = this;
+
+                /*
+                Update the position of the hex based on camera position (to allow
+                for globe-like scrolling) if required.
+                */
+                hexGO.GetComponentInChildren<TextMesh>().text = string.Format("{0},{1}", column, row);
+
+                /*
+                Update the coordinate overlay text based on the hex's position
+                */
                 hexGO.GetComponent<HexComponent>().UpdatePosition();
 
                 MeshRenderer mr = hexGO.GetComponentInChildren<MeshRenderer>();

@@ -167,8 +167,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01894b4ccc40943568f4138e29a23c2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  numColumns: 10
-  numRows: 10
+  numColumns: 24
+  numRows: 18
   HexPrefab: {fileID: 2960015392045270595, guid: 4d493f5b982ce46ea98d705ea3f65d6b, type: 3}
   HexMaterials:
   - {fileID: 2100000, guid: 7216c713925214c7db8d9e918b5996fc, type: 2}
