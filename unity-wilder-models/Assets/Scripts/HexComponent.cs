@@ -9,8 +9,10 @@ public class HexComponent : MonoBehaviour
     public void UpdatePosition() {
         this.transform.position = Hex.PositionFromCamera(
             Camera.main.transform.position, 
-            HexMap.numColumns,
-            HexMap.numRows
+            HexMap.NumColumns,
+            HexMap.NumRows,
+            HexMap.HexesWrapEastWest,
+            HexMap.HexesWrapNorthSouth
         );
     }
 }

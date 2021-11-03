@@ -36,15 +36,27 @@ public class Hex
         ```
     */
 
-    public Hex(int x, int y)
+    public Hex(int column, int row)
     {
-        this.X = x;
-        this.Y = y;
+        OffsetCoordinate = new OffsetCoordinate(column, row);
+        CubeCoordinate = CoordinateTools.OffsetOddQToCube(OffsetCoordinate);
 
-        this.Q = x;
-        this.R = Y - (x - (x&1)) / 2;
-        this.S = -(this.Q + this.R);
+        this.X = OffsetCoordinate.X;
+        this.Y = OffsetCoordinate.Y;
+
+        this.Q = CubeCoordinate.Q;
+        this.R = CubeCoordinate.R;
+        this.S = CubeCoordinate.S;
+
+        this.Elevation = 0;
+        this.Moisture = 0;
     }
+
+    /*
+    Data for tile positioning in grid.
+    */
+    public readonly OffsetCoordinate OffsetCoordinate;
+    public readonly CubeCoordinate CubeCoordinate;
 
     public readonly int X;
     public readonly int Y;
@@ -52,11 +64,15 @@ public class Hex
     public readonly int R;
     public readonly int S;
 
+    /*
+    Data for map generation and maybe in-game effects.
+    */
+    public float Elevation;
+    public float Moisture;
+
     static readonly float HEIGHT_MULTIPLIER = Mathf.Sqrt(3);
     float radius = 1f;
-
-    bool allowWrapEastWest = false;
-    bool allowWrapNorthSouth = false;
+    float gap = 0.05f;
 
     /// <summary>
     /// Returns the world-space position of this hex.
@@ -82,22 +98,33 @@ public class Hex
 
     public float HexVerticalSpacing()
     {
-        return HexHeight() * -1;
+        return (gap + HexHeight()) * -1;
     }
 
     public float HexHorizontalSpacing()
     {
-        return HexWidth() * 0.75f;
+        return gap + (HexWidth() * 0.75f);
     }
 
-    public Vector3 PositionFromCamera( Vector3 cameraPosition, int numColumns, int numRows )
+    public Vector3 PositionFromCamera(Vector3 cameraPosition, int numColumns, int numRows)
+    {
+        return PositionFromCamera(cameraPosition, numColumns, numRows, false, false);
+    }
+
+    public Vector3 PositionFromCamera( 
+        Vector3 cameraPosition, 
+        int numColumns, 
+        int numRows, 
+        bool hexesWrapEastWest,
+        bool hexesWrapNorthSouth
+        )
     {
         float mapWidth = numColumns * HexHorizontalSpacing();
         float mapHeight = numRows * HexVerticalSpacing();
 
         Vector3 position = Position();
 
-        if(allowWrapEastWest)
+        if(hexesWrapEastWest)
         {
             float howManyWidthsFromCamera = (position.x - cameraPosition.x) / mapWidth;
             
@@ -115,7 +142,7 @@ public class Hex
             position.x -= (howManyWidthsToFix * mapWidth);
         }
 
-        if(allowWrapNorthSouth)
+        if(hexesWrapNorthSouth)
         {
             float howManyHeightsFromCamera = (position.z - cameraPosition.z) / mapHeight;
             
@@ -135,6 +162,11 @@ public class Hex
 
         return position;
 
+    }
+
+    public static float Distance(Hex a, Hex b)
+    {
+        return CoordinateTools.DistanceBetweenCoordinates(a.CubeCoordinate, b.CubeCoordinate);
     }
 
 }

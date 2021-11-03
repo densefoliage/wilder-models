@@ -132,13 +132,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 422997198}
-  - component: {fileID: 422997199}
+  - component: {fileID: 422997200}
   m_Layer: 0
   m_Name: HexMap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &422997198
 Transform:
@@ -155,7 +155,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &422997199
+--- !u!114 &422997200
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -164,19 +164,27 @@ MonoBehaviour:
   m_GameObject: {fileID: 422997197}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 01894b4ccc40943568f4138e29a23c2c, type: 3}
+  m_Script: {fileID: 11500000, guid: 8fda7387d134544d9b79fb5aaedc1540, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  numColumns: 24
-  numRows: 18
+  NumColumns: 46
+  NumRows: 52
+  WaterLevel: 0
+  ElevationRenderCap_Max: 5
+  ElevationRenderCap_Min: -5
   HexPrefab: {fileID: 2960015392045270595, guid: 4d493f5b982ce46ea98d705ea3f65d6b, type: 3}
-  HexMaterials:
-  - {fileID: 2100000, guid: 7216c713925214c7db8d9e918b5996fc, type: 2}
-  - {fileID: 2100000, guid: 1efa293e04d70482b92c47fd9d257706, type: 2}
-  - {fileID: 2100000, guid: 91b4df338b59c4776b6d1b09cdd8439d, type: 2}
-  - {fileID: 2100000, guid: fa9816f357b364a04a4fb48b89265bce, type: 2}
-  - {fileID: 2100000, guid: 67b09d545efb24987a788a5c7330f6b8, type: 2}
-  - {fileID: 2100000, guid: 3ff44d00d5a59487384bf4f91a98a6a1, type: 2}
+  MeshWater: {fileID: 2534964839176971238, guid: ff4bacecb687644e6a53c100a0d44622, type: 3}
+  MeshTerrain: {fileID: 2534964839176971238, guid: ff4bacecb687644e6a53c100a0d44622, type: 3}
+  MatWater_River: {fileID: 2100000, guid: 67b09d545efb24987a788a5c7330f6b8, type: 2}
+  MatWater_Pond: {fileID: 2100000, guid: fa9816f357b364a04a4fb48b89265bce, type: 2}
+  MatTerrain_Field: {fileID: 2100000, guid: 7216c713925214c7db8d9e918b5996fc, type: 2}
+  MatTerrain_Forest: {fileID: 2100000, guid: 1efa293e04d70482b92c47fd9d257706, type: 2}
+  MatTerrain_Hedge: {fileID: 2100000, guid: 91b4df338b59c4776b6d1b09cdd8439d, type: 2}
+  MatTerrain_Scrub: {fileID: 2100000, guid: 3ff44d00d5a59487384bf4f91a98a6a1, type: 2}
+  CoordinatesWrapEastWest: 0
+  CoordinatesWrapNorthSouth: 0
+  HexesWrapEastWest: 0
+  HexesWrapNorthSouth: 0
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -349,7 +357,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 10, z: 0}
+  m_LocalPosition: {x: 34, y: 90, z: -45}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
