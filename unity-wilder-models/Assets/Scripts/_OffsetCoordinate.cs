@@ -2,8 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine; 
  
- public class OffsetCoordinate {
-    public OffsetCoordinate(int x, int y)
+ public class _OffsetCoordinate {
+    public _OffsetCoordinate(int x, int y)
     {
         this.X = x;
         this.Y = y;

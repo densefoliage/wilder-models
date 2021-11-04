@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HexComponent : MonoBehaviour
+public class _HexComponent : MonoBehaviour
 {
-    public Hex Hex;
-    public HexMap HexMap;
+    public _Hex Hex;
+    public _HexMap HexMap;
     public void UpdatePosition() {
         this.transform.position = Hex.PositionFromCamera(
             Camera.main.transform.position, 

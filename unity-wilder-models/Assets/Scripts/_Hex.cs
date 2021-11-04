@@ -12,7 +12,7 @@ translation will need to occur (at some point).
 /// neighbours, etc... of a hex tile. However, it does not interact with
 /// unity directly in any way.
 /// </summary>
-public class Hex
+public class _Hex
 {
     /*
     We are using cubic coordinates to store the position of each hex.
@@ -36,10 +36,10 @@ public class Hex
         ```
     */
 
-    public Hex(int column, int row)
+    public _Hex(int column, int row)
     {
-        OffsetCoordinate = new OffsetCoordinate(column, row);
-        CubeCoordinate = CoordinateTools.OffsetOddQToCube(OffsetCoordinate);
+        OffsetCoordinate = new _OffsetCoordinate(column, row);
+        CubeCoordinate = _CoordinateTools.OffsetOddQToCube(OffsetCoordinate);
 
         this.X = OffsetCoordinate.X;
         this.Y = OffsetCoordinate.Y;
@@ -55,8 +55,8 @@ public class Hex
     /*
     Data for tile positioning in grid.
     */
-    public readonly OffsetCoordinate OffsetCoordinate;
-    public readonly CubeCoordinate CubeCoordinate;
+    public readonly _OffsetCoordinate OffsetCoordinate;
+    public readonly _CubeCoordinate CubeCoordinate;
 
     public readonly int X;
     public readonly int Y;
@@ -164,9 +164,9 @@ public class Hex
 
     }
 
-    public static float Distance(Hex a, Hex b)
+    public static float Distance(_Hex a, _Hex b)
     {
-        return CoordinateTools.DistanceBetweenCoordinates(a.CubeCoordinate, b.CubeCoordinate);
+        return _CoordinateTools.DistanceBetweenCoordinates(a.CubeCoordinate, b.CubeCoordinate);
     }
 
 }

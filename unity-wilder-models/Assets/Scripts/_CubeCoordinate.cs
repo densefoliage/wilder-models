@@ -2,8 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-  public class CubeCoordinate {
-     public CubeCoordinate(int q, int r, int s)
+  public class _CubeCoordinate {
+     public _CubeCoordinate(int q, int r, int s)
     {
         this.Q = q;
         this.R = r;

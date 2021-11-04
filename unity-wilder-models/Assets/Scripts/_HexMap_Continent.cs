@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HexMap_Continent : HexMap
+public class _HexMap_Continent : _HexMap
 {
     /*
     Should a new map be generated when the mouse is clicked?
@@ -41,7 +41,7 @@ public class HexMap_Continent : HexMap
         {
             for (int y = 0; y < NumRows; y++)
             {
-                Hex h = GetHexByOffsetCoordinates(new OffsetCoordinate(x, y));
+                _Hex h = GetHexByOffsetCoordinates(new _OffsetCoordinate(x, y));
                 h.Elevation = baseElevation;
             }
         }
@@ -101,7 +101,7 @@ public class HexMap_Continent : HexMap
         {
             for (int y = 0; y < NumRows; y++)
             {
-                Hex h = GetHexByOffsetCoordinates(new OffsetCoordinate(x, y));
+                _Hex h = GetHexByOffsetCoordinates(new _OffsetCoordinate(x, y));
                 float n = (Mathf.PerlinNoise( 
                     noiseXOffset + (float)x/Mathf.Max(NumColumns, NumRows)/noiseResolution, 
                     noiseYOffset + (float)y/Mathf.Max(NumColumns, NumRows)/noiseResolution 
@@ -136,17 +136,17 @@ public class HexMap_Continent : HexMap
     }
     void ElevateRange(int x, int y, int range, float elevationHeight, float falloff)
     {
-        Hex centreHex = GetHexByOffsetCoordinates(new OffsetCoordinate(x, y));
+        _Hex centreHex = GetHexByOffsetCoordinates(new _OffsetCoordinate(x, y));
         if (centreHex != null)
         {
-            Hex[] targetHexes = GetHexesWithinRangeOf(centreHex, range);
-            foreach (Hex h in targetHexes)
+            _Hex[] targetHexes = GetHexesWithinRangeOf(centreHex, range);
+            foreach (_Hex h in targetHexes)
             {
                 /*
                 This doesn't this work when wrapping is on.
                 https://www.youtube.com/watch?v=XRP8BqdYHXU <- some help here
                 */
-                h.Elevation += elevationHeight * Mathf.Lerp(1f, 0f, falloff * (Hex.Distance(centreHex, h) / (range + 1)));
+                h.Elevation += elevationHeight * Mathf.Lerp(1f, 0f, falloff * (_Hex.Distance(centreHex, h) / (range + 1)));
             }
         }
     }

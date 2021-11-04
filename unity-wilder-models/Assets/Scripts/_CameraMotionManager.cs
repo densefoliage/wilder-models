@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CameraMotionManager : MonoBehaviour
+public class _CameraMotionManager : MonoBehaviour
 {
     // Start is called before the first frame update
     void Start()
@@ -28,7 +28,7 @@ public class CameraMotionManager : MonoBehaviour
         
     }
 
-    public void PanToHex ( Hex hex ) 
+    public void PanToHex ( _Hex hex ) 
     {
         /*
         To snap camera to a specific hex.
@@ -49,8 +49,8 @@ public class CameraMotionManager : MonoBehaviour
             Maybe there is a better way to cull objects not in view...
             Probably HexMap will have a dictionary of all these later.
             */
-            HexComponent[] hexes = GameObject.FindObjectsOfType<HexComponent>();
-            foreach (HexComponent hex in hexes)
+            _HexComponent[] hexes = GameObject.FindObjectsOfType<_HexComponent>();
+            foreach (_HexComponent hex in hexes)
             {
                 hex.UpdatePosition();
             }

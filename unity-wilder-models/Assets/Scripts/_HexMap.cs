@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HexMap : MonoBehaviour
+public class _HexMap : MonoBehaviour
 {
     /*
     Set the width (NumColumns) and height (NumRows) of the map
@@ -40,15 +40,15 @@ public class HexMap : MonoBehaviour
     public bool HexesWrapEastWest = true;
     public bool HexesWrapNorthSouth = true;
 
-    private Hex[,] hexes;
-    private Dictionary< Hex, GameObject > hexToGameObjectMap;
+    private _Hex[,] hexes;
+    private Dictionary< _Hex, GameObject > hexToGameObjectMap;
 
-    public Hex GetHexByOffsetCoordinates(int x, int y)
+    public _Hex GetHexByOffsetCoordinates(int x, int y)
     {
-        return GetHexByOffsetCoordinates(new OffsetCoordinate(x,y));
+        return GetHexByOffsetCoordinates(new _OffsetCoordinate(x,y));
     }
 
-    public Hex GetHexByOffsetCoordinates(OffsetCoordinate offsetCoordinate)
+    public _Hex GetHexByOffsetCoordinates(_OffsetCoordinate offsetCoordinate)
     {
         if(hexes == null)
         {
@@ -87,18 +87,18 @@ public class HexMap : MonoBehaviour
         return hexes[offsetCoordinate.X, offsetCoordinate.Y];
     }
 
-    public Hex GetHexByCubeCoordinates(int q, int r, int s)
+    public _Hex GetHexByCubeCoordinates(int q, int r, int s)
     {
-        return GetHexByCubeCoordinates(new CubeCoordinate(q,r,s));
+        return GetHexByCubeCoordinates(new _CubeCoordinate(q,r,s));
     }
-    public Hex GetHexByCubeCoordinates(CubeCoordinate cubeCoordinate)
+    public _Hex GetHexByCubeCoordinates(_CubeCoordinate cubeCoordinate)
     {
         if(hexes == null)
         {
             Debug.LogError("Hexes array not yet instantiated!");
             return null;
         }
-        OffsetCoordinate offsetCoordinate = CoordinateTools.CubeToOffsetOddQ(cubeCoordinate); 
+        _OffsetCoordinate offsetCoordinate = _CoordinateTools.CubeToOffsetOddQ(cubeCoordinate); 
         return GetHexByOffsetCoordinates(offsetCoordinate);
     }
 
@@ -118,8 +118,8 @@ public class HexMap : MonoBehaviour
         Instantiate the 2 dimensional array to store the hexes and the
         Hex to Game Object map.
         */
-        hexes = new Hex[NumColumns, NumRows];
-        hexToGameObjectMap = new Dictionary<Hex, GameObject>();
+        hexes = new _Hex[NumColumns, NumRows];
+        hexToGameObjectMap = new Dictionary<_Hex, GameObject>();
 
         for (int column = 0; column < NumColumns; column++)
         {
@@ -129,7 +129,7 @@ public class HexMap : MonoBehaviour
                 Place a Hex object using Instantiate:
                 Instantiate(GameObject, Position, Rotation, Parent)
                 */
-                Hex h = new Hex( column, row );
+                _Hex h = new _Hex( column, row );
                 h.Elevation = WaterLevel;
 
                 /*
@@ -158,8 +158,8 @@ public class HexMap : MonoBehaviour
                 Let the HexBehaviour component know to reference the Hex data
                 component from this loop.
                 */
-                hexGO.GetComponent<HexComponent>().Hex = h;
-                hexGO.GetComponent<HexComponent>().HexMap = this;
+                hexGO.GetComponent<_HexComponent>().Hex = h;
+                hexGO.GetComponent<_HexComponent>().HexMap = this;
 
                 /*
                 Update the coordinate overlay text based on the hex's position
@@ -187,7 +187,7 @@ public class HexMap : MonoBehaviour
                 Update the position of the hex based on camera position (to allow
                 for globe-like scrolling) if required.
                 */
-                hexGO.GetComponent<HexComponent>().UpdatePosition();
+                hexGO.GetComponent<_HexComponent>().UpdatePosition();
             }
         }
 
@@ -208,7 +208,7 @@ public class HexMap : MonoBehaviour
         {
             for (int row = 0; row < NumRows; row++)
             {
-                Hex h = GetHexByOffsetCoordinates(new OffsetCoordinate(column, row));
+                _Hex h = GetHexByOffsetCoordinates(new _OffsetCoordinate(column, row));
                 GameObject hexGO = hexToGameObjectMap[h];
 
                 MeshFilter mf = hexGO.GetComponentInChildren<MeshFilter>();
@@ -251,13 +251,13 @@ public class HexMap : MonoBehaviour
         return Mathf.Clamp01(mapped);
     }
 
-    public Hex[] GetHexNeighbours(Hex centreHex)
+    public _Hex[] GetHexNeighbours(_Hex centreHex)
     {
-        List<Hex> results = new List<Hex>();
-        foreach (CubeCoordinate neighbourCoordinate in CoordinateTools.GetAllNeighbourCoordinates(centreHex.CubeCoordinate))
+        List<_Hex> results = new List<_Hex>();
+        foreach (_CubeCoordinate neighbourCoordinate in _CoordinateTools.GetAllNeighbourCoordinates(centreHex.CubeCoordinate))
         {
-            Hex h = GetHexByCubeCoordinates(
-                new CubeCoordinate(
+            _Hex h = GetHexByCubeCoordinates(
+                new _CubeCoordinate(
                     neighbourCoordinate.Q, 
                     neighbourCoordinate.R, 
                     neighbourCoordinate.S
@@ -270,13 +270,13 @@ public class HexMap : MonoBehaviour
         return results.ToArray();
     }
 
-    public Hex[] GetHexDiagonalNeighbours(Hex centreHex)
+    public _Hex[] GetHexDiagonalNeighbours(_Hex centreHex)
     {
-        List<Hex> results = new List<Hex>();
-        foreach (CubeCoordinate neighbourCoordinate in CoordinateTools.GetAllDiagonalNeighbourCoordinates(centreHex.CubeCoordinate))
+        List<_Hex> results = new List<_Hex>();
+        foreach (_CubeCoordinate neighbourCoordinate in _CoordinateTools.GetAllDiagonalNeighbourCoordinates(centreHex.CubeCoordinate))
         {
-            Hex h = GetHexByCubeCoordinates(
-                new CubeCoordinate(
+            _Hex h = GetHexByCubeCoordinates(
+                new _CubeCoordinate(
                     neighbourCoordinate.Q, 
                     neighbourCoordinate.R, 
                     neighbourCoordinate.S
@@ -289,13 +289,13 @@ public class HexMap : MonoBehaviour
         return results.ToArray();
     }
 
-    public Hex[] GetHexesWithinRangeOf(Hex centreHex, int range)
+    public _Hex[] GetHexesWithinRangeOf(_Hex centreHex, int range)
     {
-        List<Hex> results = new List<Hex>();
-        foreach (CubeCoordinate neighbourCoordinate in CoordinateTools.GetCoordinatesWithinRangeOf(centreHex.CubeCoordinate, range))
+        List<_Hex> results = new List<_Hex>();
+        foreach (_CubeCoordinate neighbourCoordinate in _CoordinateTools.GetCoordinatesWithinRangeOf(centreHex.CubeCoordinate, range))
         {
-            Hex h = GetHexByCubeCoordinates(
-                new CubeCoordinate(
+            _Hex h = GetHexByCubeCoordinates(
+                new _CubeCoordinate(
                     neighbourCoordinate.Q, 
                     neighbourCoordinate.R, 
                     neighbourCoordinate.S

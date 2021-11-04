@@ -108,7 +108,7 @@ GameObject:
   - component: {fileID: 35587569908114146}
   - component: {fileID: 8806476140240764856}
   m_Layer: 0
-  m_Name: Hex
+  m_Name: _Hex
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
