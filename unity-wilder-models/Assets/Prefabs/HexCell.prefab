@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 3575932171420157704}
   - component: {fileID: 1307363772134048443}
-  - component: {fileID: 5162318568786960516}
   m_Layer: 0
   m_Name: HexCell
   m_TagString: Untagged
@@ -45,15 +44,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1669416433ff24d7f86156a578425a8b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &5162318568786960516
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5934324487562366848}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 76c8a0bf85fe14044837cac5808024b3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  coordinates:
+    x: 0
+    z: 0

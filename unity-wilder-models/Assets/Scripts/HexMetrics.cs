@@ -6,7 +6,7 @@ public static class HexMetrics
 {
     private const float ROOT_3_DIV_2 = 0.86602540378f; // sqrt(3)/2
     private const float PI = Mathf.PI; // sqrt(3)/2
-    public const float INNER_RADIUS = 10f;
+    public const float INNER_RADIUS = 1f;
     public const float OUTER_RADIUS = INNER_RADIUS / ROOT_3_DIV_2;
 
     /*
