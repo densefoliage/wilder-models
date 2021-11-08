@@ -1,4 +1,6 @@
-# wilder-models
+# wilder-models // GameObjectMethod
+This branch includes all the game object method code developed following the Quill18Creates tutorial.
+
 MAMF Graduation Project
 
 Basic 4X style hexagonal grid game mechanics based on Quill18Creates' YouTube tutorial series "Mostly Civilised":
