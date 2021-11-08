@@ -16,3 +16,8 @@ Hexagonal grid math based on Red Blob Games' web resources:
 Some interesting thoughts on different grid systems in geospatial data visualisation:
 * ('Fishnets and Honeycomb')[https://strimas.com/post/hexagonal-grids/]
 
+---
+
+TO DO:
+- Find and link simulating half earth socialism game
+- Find and link 'space and time' gaming/research blog
