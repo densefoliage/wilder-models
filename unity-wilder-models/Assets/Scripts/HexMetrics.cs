@@ -8,6 +8,8 @@ public static class HexMetrics
     private const float PI = Mathf.PI; // sqrt(3)/2
     public const float INNER_RADIUS = 1f;
     public const float OUTER_RADIUS = INNER_RADIUS / ROOT_3_DIV_2;
+    public const float solidFactor = 0.75f;
+    public const float blendFactor = 1f - solidFactor;
 
     /*
     A function to find each vertex of the hexagon, with the vertex on the
@@ -33,4 +35,36 @@ public static class HexMetrics
         FlatHexCorner( OUTER_RADIUS, 4 ),
         FlatHexCorner( OUTER_RADIUS, 5 )
     };
+
+    public static Vector3 GetCorner (int i) {
+        /* 
+        If we ever minus from a direction, we need to +6 before the modulo
+        to account for negative looping.
+        */
+        return corners[
+            i % 6
+        ];
+    }
+
+    public static Vector3 GetFirstSolidCorner (HexDirection direction) 
+    {
+		return GetCorner((int)direction) * solidFactor;
+	}
+
+	public static Vector3 GetSecondSolidCorner (HexDirection direction) 
+    {
+		return GetCorner((int)direction + 1) * solidFactor;
+	}
+    public static Vector3 GetFirstCorner(HexDirection direction)
+    {
+        return GetCorner((int)direction);
+    }
+    public static Vector3 GetSecondCorner(HexDirection direction)
+    {
+        return GetCorner((int)direction+1);
+    }
+	public static Vector3 GetBridge (HexDirection direction) {
+		return (GetCorner((int)direction) + GetCorner((int)direction+1)) 
+            * blendFactor;
+	}
 }
