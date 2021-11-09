@@ -57,7 +57,6 @@ public class HexGrid : MonoBehaviour
         cell.coordinates = HexCoordinates.FromOffsetCoordinates(x, z);
         cell.color = defaultColor;
         cell.name = "Hex" + cell.coordinates.ToString();
-
         /* 
         Connecting neighbours... 
         */
@@ -104,6 +103,8 @@ public class HexGrid : MonoBehaviour
             position.z
         );
         UpdateLabelText(i);
+        
+        cell.uiRect = label.rectTransform;
     }
 
     // Start is called before the first frame update

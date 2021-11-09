@@ -41,12 +41,13 @@ public class HexMapEditor : MonoBehaviour
     {
 		activeColor = colors[index];
 	}
-	public void SetElevation (float elevation) {
-		activeElevation = (int)elevation;
+	public void SetElevation (float elevation) 
+	{
+		activeElevation = elevation;
 	}
 	void EditCell (HexCell cell) {
 		cell.color = activeColor;
-		cell.elevation = activeElevation;
+		cell.Elevation = activeElevation;
 		hexGrid.Refresh();
 	}
 }
