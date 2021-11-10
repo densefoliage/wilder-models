@@ -4,18 +4,23 @@ using UnityEngine;
 
 public static class HexMetrics
 {
+    public static Texture2D noiseSource;
     private const float ROOT_3_DIV_2 = 0.86602540378f; // sqrt(3)/2
     private const float PI = Mathf.PI;
     public const float INNER_RADIUS = 1f;
     public const float OUTER_RADIUS = INNER_RADIUS / ROOT_3_DIV_2;
-    public const float SOLID_FACTOR = 0.75f;
+    public const float SOLID_FACTOR = 0.8f;
     public const float BLEND_FACTOR = 1f - SOLID_FACTOR;
-    public const float ELEVATION_FACTOR = 0.25f;
+    public const float ELEVATION_FACTOR = 0.5f;
     public const int TERRACES_PER_SLOPE = 2;
     public const int TERRACE_STEPS = TERRACES_PER_SLOPE * 2 + 1;
     public const float HORIZONTAL_TERRACE_STEP_SIZE = 1f / TERRACE_STEPS;
     public const float VERTICAL_TERRACE_STEP_SIZE = 1f / (TERRACES_PER_SLOPE+1);
     public const float STEEP_THRESHOLD = 2f;
+    public const float CELL_PERTURB_FACTOR = 0.75f;
+    public const float ELEVATION_PERTURB_FACTOR = 0.25f;
+    public const float NOISE_SCALE = 0.01f;
+    public const int CHUNK_SIZE_X = 5, CHUNK_SIZE_Z = 5;
 
     // public const float elevationStep = 5f;
 
@@ -98,5 +103,12 @@ public static class HexMetrics
 			return HexEdgeType.Slope;
 		}
 		return HexEdgeType.Cliff;
+	}
+    public static Vector4 SampleNoise (Vector3 position) 
+    {
+        return noiseSource.GetPixelBilinear(
+            position.x * NOISE_SCALE, 
+            position.z * NOISE_SCALE
+        );
 	}
 }

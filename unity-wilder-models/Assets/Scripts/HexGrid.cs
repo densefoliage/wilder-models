@@ -5,41 +5,60 @@ using UnityEngine.UI;
 
 public class HexGrid : MonoBehaviour
 {
-    public int width = 6;
-    public int height = 6;
+    public int chunkCountX = 4, chunkCountZ = 3;
+    public HexGridChunk chunkPrefab;
     public HexCell cellPrefab;
     public Text cellLabelPrefab;
 	public Color defaultColor = Color.white;
-	public Color touchedColor = Color.magenta;
+    public Texture2D noiseSource;
 
-    Canvas gridCanvas;
-    HexMesh hexMesh;
+    int cellCountX, cellCountZ;
+    HexGridChunk[] chunks;
     HexCell[] cells;
     Text[] labels;
     string[] overlayModes = {
         "coordinates",
         "index",
+        "chunk",
         "hidden"
     };
-    int previousOverlayMode;
-    int activeOverlayMode = 0;
+    int activeOverlayMode = 2;
 
     void Awake() 
     {
-        gridCanvas = GetComponentInChildren<Canvas>();
-        hexMesh = GetComponentInChildren<HexMesh>();
-        cells = new HexCell[height * width];
-        labels = new Text[height * width];
+        HexMetrics.noiseSource = noiseSource;
 
-        for (int x = 0, i = 0; x < width; x++)
-        {
-            for (int z = 0; z < height; z++)
-            {
-                CreateCell(x, z, i++);
-            }
-        }
+		cellCountX = chunkCountX * HexMetrics.CHUNK_SIZE_X;
+		cellCountZ = chunkCountZ * HexMetrics.CHUNK_SIZE_Z;
+
+        CreateChunks();
+		CreateCells();
     }
+    void OnEnable () 
+    {
+		HexMetrics.noiseSource = noiseSource;
+	}
+	void CreateChunks () {
+		chunks = new HexGridChunk[chunkCountX * chunkCountZ];
 
+		for (int x = 0, i = 0; x < chunkCountX; x++) {
+			for (int z = 0; z < chunkCountZ; z++) {
+				HexGridChunk chunk = chunks[i++] = Instantiate(chunkPrefab);
+				chunk.transform.SetParent(this.transform);
+                chunk.index = i;
+			}
+		}
+	}
+	void CreateCells () {
+		cells = new HexCell[cellCountX * cellCountZ];
+        labels = new Text[cellCountX * cellCountZ];
+
+		for (int x = 0, i = 0; x < cellCountX; x++) {
+			for (int z = 0; z < cellCountZ; z++) {
+				CreateCell(x, z, i++);
+			}
+		}
+	}
     void CreateCell(int x, int z, int i)
     {
         Vector3 position = new Vector3(
@@ -51,11 +70,9 @@ public class HexGrid : MonoBehaviour
         HexCell cell = cells[i] = Instantiate<HexCell>(
             cellPrefab,
             position,
-            Quaternion.identity,
-            this.transform
+            Quaternion.identity
             );
         cell.coordinates = HexCoordinates.FromOffsetCoordinates(x, z);
-        cell.color = defaultColor;
         cell.name = "Hex" + cell.coordinates.ToString();
         /* 
         Connecting neighbours... 
@@ -73,7 +90,7 @@ public class HexGrid : MonoBehaviour
                 /* 
                 Next we connect NE to SW on even columns (after column 0).
                 */
-                cell.SetNeighbour(HexDirection.SW, cells[i-height]);
+                cell.SetNeighbour(HexDirection.SW, cells[i-cellCountZ]);
 
                 if (z > 0) 
                 {
@@ -81,55 +98,46 @@ public class HexGrid : MonoBehaviour
                     We can connect to the NW neighbours as well, except for the first 
                     cell in each column (because it doesn't have one).
                     */
-                    cell.SetNeighbour(HexDirection.NW, cells[i-height-1]);
+                    cell.SetNeighbour(HexDirection.NW, cells[i-cellCountZ-1]);
                 }
             } else {
                 /*
                 The odd rows follow the same logic, but mirrored....
                 */
-                cell.SetNeighbour(HexDirection.NW, cells[i-height]);
+                cell.SetNeighbour(HexDirection.NW, cells[i-cellCountZ]);
 
-                if (z < height - 1) 
+                if (z < cellCountZ - 1) 
                 {
-                    cell.SetNeighbour(HexDirection.SW, cells[i-height+1]);
+                    cell.SetNeighbour(HexDirection.SW, cells[i-cellCountZ+1]);
                 }
             } 
         }
 
         Text label = labels[i] = Instantiate<Text>(cellLabelPrefab);
-        label.rectTransform.SetParent(gridCanvas.transform, false);
         label.rectTransform.anchoredPosition = new Vector2(
             position.x,
             position.z
         );
-        UpdateLabelText(i);
-        
         cell.uiRect = label.rectTransform;
+        /*
+        Elevation must only be set after the label ui rect has been linked!
+        */
+        cell.Elevation = 0;
+        AddCellToChunk(x, z, cell);
+        UpdateLabelText(i);
     }
+	void AddCellToChunk (int x, int z, HexCell cell) {
+		int chunkX = x / HexMetrics.CHUNK_SIZE_X;
+		int chunkZ = z / HexMetrics.CHUNK_SIZE_Z;
+        cell.Color = Color.Lerp(Color.white, Color.black, (float)(chunkZ + chunkX * chunkCountZ)/(chunkCountX*chunkCountZ));
+		
+        int chunkIndex = chunkZ + chunkX * chunkCountZ;
+        HexGridChunk chunk = chunks[chunkIndex];
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        hexMesh.Triangulate(cells);
-        previousOverlayMode = activeOverlayMode;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (Input.GetKeyDown("space"))
-        {
-            // Debug.Log("Input.GetKeyDown(\"space\")");
-            IncrementOverlayMode();
-        }
-        if (activeOverlayMode != previousOverlayMode) {
-            /* the overlay mode has changed! */
-            // Debug.Log("overlay mode: " + overlayModes[activeOverlayMode]);
-            UpdateAllLabelText();
-            previousOverlayMode = activeOverlayMode;
-        }
-    }
-	
+		int localX = x - chunkX * HexMetrics.CHUNK_SIZE_X;
+		int localZ = z - chunkZ * HexMetrics.CHUNK_SIZE_Z;
+		chunk.AddCell(localZ + localX * HexMetrics.CHUNK_SIZE_Z, cell);
+	}	
 	public HexCell GetCellByPosition (Vector3 position) 
     {
 		position = transform.InverseTransformPoint(position);
@@ -142,7 +150,7 @@ public class HexGrid : MonoBehaviour
         /*
         This is wrapping vertically!
         */
-        int index = coordinates.Z + coordinates.X * width + coordinates.X / 2;
+        int index = coordinates.Z + coordinates.X * cellCountZ + coordinates.X / 2;
         return index;
     }
     void IncrementOverlayMode() 
@@ -160,6 +168,9 @@ public class HexGrid : MonoBehaviour
         } else if ( overlayModes[activeOverlayMode] == "index" ) {
             label.enabled = true;
             label.text = i.ToString();
+        } else if ( overlayModes[activeOverlayMode] == "chunk" ) {
+            label.enabled = true;
+            label.text = cell.chunk.index.ToString();
         } else {
             /* Else default to no label */
             label.enabled = false;
@@ -172,7 +183,4 @@ public class HexGrid : MonoBehaviour
             UpdateLabelText(i);
         }
     }
-	public void Refresh () {
-		hexMesh.Triangulate(cells);
-	}
 }
