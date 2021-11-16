@@ -8,18 +8,15 @@ public class HexMesh : MonoBehaviour
 
     Mesh hexMesh;
     MeshCollider meshCollider;
-    List<Vector3> vertices;
-    List<Color> colors;
-    List<int> triangles;
+	static List<Vector3> vertices = new List<Vector3>();
+	static List<Color> colors = new List<Color>();
+	static List<int> triangles = new List<int>();
 
     void Awake()
     {
         GetComponent<MeshFilter>().mesh = hexMesh = new Mesh();
         meshCollider = gameObject.AddComponent<MeshCollider>();
         hexMesh.name = "Hex Mesh";
-        vertices = new List<Vector3>();
-        colors = new List<Color>();
-        triangles = new List<int>();
     }
 
     public void Triangulate(HexCell[] cells)

@@ -21,8 +21,7 @@ public static class HexMetrics
     public const float ELEVATION_PERTURB_FACTOR = 0.25f;
     public const float NOISE_SCALE = 0.01f;
     public const int CHUNK_SIZE_X = 5, CHUNK_SIZE_Z = 5;
-
-    // public const float elevationStep = 5f;
+    public const float WATER_ELEVATION_OFFSET = -0.5f;
 
     /*
     A function to find each vertex of the hexagon, with the vertex on the

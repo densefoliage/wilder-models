@@ -16,13 +16,13 @@ public class HexGrid : MonoBehaviour
     HexGridChunk[] chunks;
     HexCell[] cells;
     Text[] labels;
-    string[] overlayModes = {
-        "coordinates",
+    string[] labelModes = {
+        "none",
         "index",
-        "chunk",
-        "hidden"
+        "coordinates",
+        "chunk"
     };
-    int activeOverlayMode = 2;
+    int activeLabelModeIndex = 0;
 
     void Awake() 
     {
@@ -73,6 +73,7 @@ public class HexGrid : MonoBehaviour
             Quaternion.identity
             );
         cell.coordinates = HexCoordinates.FromOffsetCoordinates(x, z);
+        cell.index = i;
         cell.name = "Hex" + cell.coordinates.ToString();
         /* 
         Connecting neighbours... 
@@ -118,18 +119,16 @@ public class HexGrid : MonoBehaviour
             position.x,
             position.z
         );
-        cell.uiRect = label.rectTransform;
+        cell.Label = label;
         /*
         Elevation must only be set after the label ui rect has been linked!
         */
         cell.Elevation = 0;
         AddCellToChunk(x, z, cell);
-        UpdateLabelText(i);
     }
 	void AddCellToChunk (int x, int z, HexCell cell) {
 		int chunkX = x / HexMetrics.CHUNK_SIZE_X;
 		int chunkZ = z / HexMetrics.CHUNK_SIZE_Z;
-        cell.Color = Color.Lerp(Color.white, Color.black, (float)(chunkZ + chunkX * chunkCountZ)/(chunkCountX*chunkCountZ));
 		
         int chunkIndex = chunkZ + chunkX * chunkCountZ;
         HexGridChunk chunk = chunks[chunkIndex];
@@ -145,42 +144,49 @@ public class HexGrid : MonoBehaviour
 		return cells[CoordinatesToIndex(coordinates)];
 		// Debug.Log("touched cell" + coordinates.ToString() + " at index: " + CoordinatesToIndex(coordinates));
 	}
+    public HexCell GetCellByCoordinates(HexCoordinates coordinates)
+    {
+		int x = coordinates.X;
+		if (x < 0 || x >= cellCountX) {
+			return null;
+		}
+		int z = coordinates.Z + x / 2;
+		if (z < 0 || z >= cellCountZ) {
+			return null;
+		}
+        return cells[CoordinatesToIndex(coordinates)];
+    }
     int CoordinatesToIndex(HexCoordinates coordinates)
     {
         /*
         This is wrapping vertically!
         */
-        int index = coordinates.Z + coordinates.X * cellCountZ + coordinates.X / 2;
+        int x = coordinates.X;
+        if (x > cellCountX) {
+            x = cellCountX;
+        } else if (x < 0) {
+            x = 0;
+        }
+
+        int z = coordinates.Z + x / 2;
+        if (z > cellCountZ) {
+            z = cellCountZ;
+        } else if (z < 0) {
+            z = 0;
+        }
+
+        int index = z + x * cellCountZ;
         return index;
     }
-    void IncrementOverlayMode() 
-    {
-        activeOverlayMode = (activeOverlayMode+1)%overlayModes.Length;
-        Debug.Log(activeOverlayMode);
-    }
-    void UpdateLabelText(int i)
-    {
-        Text label = labels[i];
-        HexCell cell = cells[i];
-        if ( overlayModes[activeOverlayMode] == "coordinates" ) {
-            label.enabled = true;
-            label.text = cell.coordinates.ToStringOnSeparateLines();
-        } else if ( overlayModes[activeOverlayMode] == "index" ) {
-            label.enabled = true;
-            label.text = i.ToString();
-        } else if ( overlayModes[activeOverlayMode] == "chunk" ) {
-            label.enabled = true;
-            label.text = cell.chunk.index.ToString();
-        } else {
-            /* Else default to no label */
-            label.enabled = false;
-        }
-    }
-    void UpdateAllLabelText()
-    {
-        for (int i = 0; i < labels.Length; i++)
+	public void SelectLabelMode (int index) {
+		activeLabelModeIndex = index;
+        setChunkLabels ();
+	}
+
+    void setChunkLabels () {
+        foreach (HexGridChunk chunk in chunks)
         {
-            UpdateLabelText(i);
+            chunk.SetLabelMode(labelModes[activeLabelModeIndex]);
         }
     }
 }
