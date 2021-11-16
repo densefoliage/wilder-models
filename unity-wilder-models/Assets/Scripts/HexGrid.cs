@@ -73,6 +73,7 @@ public class HexGrid : MonoBehaviour
             Quaternion.identity
             );
         cell.coordinates = HexCoordinates.FromOffsetCoordinates(x, z);
+        cell.Color = defaultColor;
         cell.index = i;
         cell.name = "Hex" + cell.coordinates.ToString();
         /* 

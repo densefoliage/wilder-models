@@ -9,9 +9,15 @@ public class HexMapEditor : MonoBehaviour
 	public HexGrid hexGrid;
 	Color activeColor;
 	float activeElevation;
+	float activeWaterLevel;
 	bool applyColor;
 	bool applyElevation = true;
+	bool applyWaterLevel = true;
 	int brushSize;
+	OptionalToggle streamMode;
+	bool isDrag;
+	HexDirection dragDirection;
+	HexCell previousCell;
 
 	void Awake () {
 		SelectColor(0);
@@ -27,8 +33,11 @@ public class HexMapEditor : MonoBehaviour
 	void Update () {
 		if (Input.GetMouseButton(0) &&
 			!EventSystem.current.IsPointerOverGameObject())
-            {
+		{
 			HandleInput();
+		}
+		else {
+			previousCell = null;
 		}
 	}
 
@@ -37,8 +46,37 @@ public class HexMapEditor : MonoBehaviour
 		Ray inputRay = Camera.main.ScreenPointToRay(Input.mousePosition);
 		RaycastHit hit;
 		if (Physics.Raycast(inputRay, out hit)) {
-			EditCells(hexGrid.GetCellByPosition(hit.point));
+			HexCell currentCell = hexGrid.GetCellByPosition(hit.point);
+			if (previousCell && previousCell != currentCell) {
+				ValidateDrag(currentCell);
+			}
+			else {
+				isDrag = false;
+			}
+			EditCells(currentCell);
+			previousCell = currentCell;
 		}
+		else {
+			previousCell = null;
+		}
+	}
+	void ValidateDrag (HexCell currentCell) {
+		for (
+			dragDirection = HexDirection.SE;
+			dragDirection <= HexDirection.NE;
+			dragDirection++
+		) {
+			if (previousCell.GetNeighbour(dragDirection) == currentCell) {
+				isDrag = true;
+				return;
+			}
+		}
+		/*
+		TO DO: Prevent drag from jittering back and forth to by remembering
+		drag direction and preventing it from immediately going in the opposite
+		direction.
+		*/
+		isDrag = false;
 	}
 	public void SelectColor (int index) 
     {
@@ -47,12 +85,22 @@ public class HexMapEditor : MonoBehaviour
 			activeColor = colors[index];	
 		}
 	}
+	public void SetApplyElevation (bool toggle) {
+		applyElevation = toggle;
+	}
 	public void SetElevation (float elevation) 
 	{
 		activeElevation = elevation;
 	}
-	public void SetApplyElevation (bool toggle) {
-		applyElevation = toggle;
+	public void SetApplyWaterLevel (bool toggle) {
+		applyWaterLevel = toggle;
+	}
+	
+	public void SetWaterLevel (float level) {
+		activeWaterLevel = (int)level;
+	}
+	public void SetStreamMode (int mode) {
+		streamMode = (OptionalToggle)mode;
 	}
 	public void SelectLabelMode (int index) 
     {
@@ -86,6 +134,18 @@ public class HexMapEditor : MonoBehaviour
 			}
 			if (applyElevation) {
 				cell.Elevation = activeElevation;
+			}
+			if (applyWaterLevel) {
+				cell.WaterLevel = activeWaterLevel;
+			}
+			if (streamMode == OptionalToggle.No) {
+				cell.RemoveStream();
+			}
+			else if (isDrag && streamMode == OptionalToggle.Yes) {
+				HexCell otherCell = cell.GetNeighbour(dragDirection.Opposite());
+				if (otherCell) {
+					otherCell.SetOutgoingStream(dragDirection);
+				}
 			}
 		}
 	}

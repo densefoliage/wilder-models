@@ -43,6 +43,20 @@ public class HexCell : MonoBehaviour
             Vector3 uiPosition = uiRect.localPosition;
 			uiPosition.z = -position.y;
 			uiRect.localPosition = uiPosition;
+
+			if (
+				hasOutgoingStream &&
+				elevation < GetNeighbour(outgoingStream).elevation
+			) {
+				RemoveOutgoingStream();
+			}
+			if (
+				hasIncomingStream &&
+				elevation > GetNeighbour(incomingStream).elevation
+			) {
+				RemoveIncomingStream();
+			}
+
             Refresh();
         }
     }
@@ -60,7 +74,7 @@ public class HexCell : MonoBehaviour
             uiRect = label.rectTransform;
         }
     }
-	public int WaterLevel {
+	public float WaterLevel {
 		get {
 			return waterLevel;
 		}
@@ -75,6 +89,13 @@ public class HexCell : MonoBehaviour
 	public bool IsUnderwater {
 		get {
 			return waterLevel > elevation;
+		}
+	}
+	public float StreamBedY {
+		get {
+			return
+				(elevation + HexMetrics.STREAM_BED_ELEVATION_OFFSET) *
+				HexMetrics.ELEVATION_FACTOR;
 		}
 	}
 	public float WaterSurfaceY {
@@ -92,7 +113,9 @@ public class HexCell : MonoBehaviour
     Color color;
     float elevation = int.MinValue;
     Text label;
-    int waterLevel;
+    float waterLevel;
+    bool hasIncomingStream, hasOutgoingStream;
+    HexDirection incomingStream, outgoingStream;
 
     // Start is called before the first frame update
     void Start()
@@ -124,6 +147,93 @@ public class HexCell : MonoBehaviour
 			elevation, otherCell.elevation
 		);
 	}
+	public bool HasIncomingStream {
+		get {
+			return hasIncomingStream;
+		}
+	}
+
+	public bool HasOutgoingStream {
+		get {
+			return hasOutgoingStream;
+		}
+	}
+
+	public HexDirection IncomingStream {
+		get {
+			return incomingStream;
+		}
+	}
+
+	public HexDirection OutgoingStream {
+		get {
+			return outgoingStream;
+		}
+	}
+    public bool HasStream {
+		get {
+			return hasIncomingStream || hasOutgoingStream;
+		}
+	}
+	public bool HasStreamBeginOrEnd {
+		get {
+			return hasIncomingStream != hasOutgoingStream;
+		}
+	}
+	public bool HasStreamThroughEdge (HexDirection direction) {
+		return
+			hasIncomingStream && incomingStream == direction ||
+			hasOutgoingStream && outgoingStream == direction;
+	}
+	public void RemoveOutgoingStream () {
+		if (!hasOutgoingStream) {
+			return;
+		}
+		hasOutgoingStream = false;
+		RefreshSelfOnly();
+        
+        HexCell neighbour = GetNeighbour(outgoingStream);
+		neighbour.hasIncomingStream = false;
+		neighbour.RefreshSelfOnly();
+	}
+	public void RemoveIncomingStream () {
+		if (!hasIncomingStream) {
+			return;
+		}
+		hasIncomingStream = false;
+		RefreshSelfOnly();
+
+		HexCell neighbour = GetNeighbour(incomingStream);
+		neighbour.hasOutgoingStream = false;
+		neighbour.RefreshSelfOnly();
+	}
+	public void RemoveStream () {
+		RemoveOutgoingStream();
+		RemoveIncomingStream();
+	}
+	public void SetOutgoingStream (HexDirection direction) {
+		if (hasOutgoingStream && outgoingStream == direction) {
+			return;
+		}
+
+		HexCell neighbour = GetNeighbour(direction);
+		if (!neighbour || elevation < neighbour.elevation) {
+			return;
+		}
+
+		RemoveOutgoingStream();
+		if (hasIncomingStream && incomingStream == direction) {
+			RemoveIncomingStream();
+		}
+
+		hasOutgoingStream = true;
+		outgoingStream = direction;
+		RefreshSelfOnly();
+		neighbour.RemoveIncomingStream();
+		neighbour.hasIncomingStream = true;
+		neighbour.incomingStream = direction.Opposite();
+		neighbour.RefreshSelfOnly();
+	}
 	void Refresh () {
 		if (chunk) {
 			chunk.Refresh();
@@ -134,5 +244,8 @@ public class HexCell : MonoBehaviour
 				}
 			}
 		}
+	}
+	void RefreshSelfOnly () {
+		chunk.Refresh();
 	}
 }

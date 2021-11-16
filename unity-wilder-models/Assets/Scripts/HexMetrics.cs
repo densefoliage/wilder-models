@@ -6,9 +6,11 @@ public static class HexMetrics
 {
     public static Texture2D noiseSource;
     private const float ROOT_3_DIV_2 = 0.86602540378f; // sqrt(3)/2
+    public const float OUTER_TO_INNER = ROOT_3_DIV_2;
+    public const float INNER_TO_OUTER = 1f / OUTER_TO_INNER;
     private const float PI = Mathf.PI;
     public const float INNER_RADIUS = 1f;
-    public const float OUTER_RADIUS = INNER_RADIUS / ROOT_3_DIV_2;
+    public const float OUTER_RADIUS = INNER_RADIUS * INNER_TO_OUTER;
     public const float SOLID_FACTOR = 0.8f;
     public const float BLEND_FACTOR = 1f - SOLID_FACTOR;
     public const float ELEVATION_FACTOR = 0.5f;
@@ -17,10 +19,11 @@ public static class HexMetrics
     public const float HORIZONTAL_TERRACE_STEP_SIZE = 1f / TERRACE_STEPS;
     public const float VERTICAL_TERRACE_STEP_SIZE = 1f / (TERRACES_PER_SLOPE+1);
     public const float STEEP_THRESHOLD = 2f;
-    public const float CELL_PERTURB_FACTOR = 0.75f;
-    public const float ELEVATION_PERTURB_FACTOR = 0.25f;
+    public const float CELL_PERTURB_FACTOR = 0.0f;
+    public const float ELEVATION_PERTURB_FACTOR = 0.0f;
     public const float NOISE_SCALE = 0.01f;
     public const int CHUNK_SIZE_X = 5, CHUNK_SIZE_Z = 5;
+    public const float STREAM_BED_ELEVATION_OFFSET = -1f;
     public const float WATER_ELEVATION_OFFSET = -0.5f;
 
     /*
@@ -110,4 +113,20 @@ public static class HexMetrics
             position.z * NOISE_SCALE
         );
 	}
+	public static Vector3 GetSolidEdgeMiddle (HexDirection direction) {
+		return
+			(GetCorner((int)direction) + GetCorner((int)direction + 1)) *
+			(0.5f * SOLID_FACTOR);
+	}
+    public static Vector3 Perturb(Vector3 position)
+    {
+        Vector4 sample = SampleNoise(position);
+        /*
+        Displace the position with noise value remapped to between -1 and 1;
+        */
+        position.x += (sample.x * 2f - 1f) * CELL_PERTURB_FACTOR;
+        // position.y += (sample.y * 2f -1f) * HexMetrics.CELL_PERTURB_FACTOR;
+        position.z += (sample.z * 2f - 1f) * CELL_PERTURB_FACTOR;
+        return position;
+    }
 }
