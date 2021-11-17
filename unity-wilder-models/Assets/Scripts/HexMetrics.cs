@@ -19,12 +19,13 @@ public static class HexMetrics
     public const float HORIZONTAL_TERRACE_STEP_SIZE = 1f / TERRACE_STEPS;
     public const float VERTICAL_TERRACE_STEP_SIZE = 1f / (TERRACES_PER_SLOPE+1);
     public const float STEEP_THRESHOLD = 2f;
-    public const float CELL_PERTURB_FACTOR = 0.0f;
-    public const float ELEVATION_PERTURB_FACTOR = 0.0f;
+    public const float CELL_PERTURB_FACTOR = 0.25f;
+    public const float ELEVATION_PERTURB_FACTOR = 0.125f;
     public const float NOISE_SCALE = 0.01f;
     public const int CHUNK_SIZE_X = 5, CHUNK_SIZE_Z = 5;
     public const float STREAM_BED_ELEVATION_OFFSET = -1f;
     public const float WATER_ELEVATION_OFFSET = -0.5f;
+    public const float ROAD_ELEVATION_DIFFERENCE_THRESHOLD = 1f;
 
     /*
     A function to find each vertex of the hexagon, with the vertex on the

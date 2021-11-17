@@ -56,6 +56,12 @@ public class HexCell : MonoBehaviour
 			) {
 				RemoveIncomingStream();
 			}
+			
+			for (int i = 0; i < roads.Length; i++) {
+				if (roads[i] && GetElevationDifference((HexDirection)i) > 1) {
+					SetRoad(i, false);
+				}
+			}
 
             Refresh();
         }
@@ -98,6 +104,13 @@ public class HexCell : MonoBehaviour
 				HexMetrics.ELEVATION_FACTOR;
 		}
 	}
+	public float StreamSurfaceY {
+		get {
+			return
+				(elevation + HexMetrics.WATER_ELEVATION_OFFSET) *
+				HexMetrics.ELEVATION_FACTOR;
+		}
+	}
 	public float WaterSurfaceY {
 		get {
 			return
@@ -110,6 +123,10 @@ public class HexCell : MonoBehaviour
 
     [SerializeField]
     HexCell[] neighbours;
+
+	[SerializeField]
+	bool[] roads;
+
     Color color;
     float elevation = int.MinValue;
     Text label;
@@ -128,6 +145,11 @@ public class HexCell : MonoBehaviour
     {
         
     }
+
+
+	/*
+	CORE
+	*/
     public HexCell GetNeighbour(HexDirection direction) 
     {
         return neighbours[(int)direction];
@@ -147,24 +169,29 @@ public class HexCell : MonoBehaviour
 			elevation, otherCell.elevation
 		);
 	}
+	public float GetElevationDifference (HexDirection direction) {
+		float difference = elevation - GetNeighbour(direction).elevation;
+		return difference >= 0 ? difference : -difference;
+	}
+
+	/*
+	STREAMS
+	*/
 	public bool HasIncomingStream {
 		get {
 			return hasIncomingStream;
 		}
 	}
-
 	public bool HasOutgoingStream {
 		get {
 			return hasOutgoingStream;
 		}
 	}
-
 	public HexDirection IncomingStream {
 		get {
 			return incomingStream;
 		}
 	}
-
 	public HexDirection OutgoingStream {
 		get {
 			return outgoingStream;
@@ -228,12 +255,55 @@ public class HexCell : MonoBehaviour
 
 		hasOutgoingStream = true;
 		outgoingStream = direction;
-		RefreshSelfOnly();
+		
 		neighbour.RemoveIncomingStream();
 		neighbour.hasIncomingStream = true;
 		neighbour.incomingStream = direction.Opposite();
-		neighbour.RefreshSelfOnly();
+
+		SetRoad((int)direction, false);
 	}
+
+
+	/*
+	ROADS
+	*/
+	public bool HasRoadThroughEdge (HexDirection direction) {
+		return roads[(int)direction];
+	}
+	public bool HasRoads {
+		get {
+			for (int i = 0; i < roads.Length; i++) {
+				if (roads[i]) {
+					return true;
+				}
+			}
+			return false;
+		}
+	}
+	public void AddRoad (HexDirection direction) {
+		if (!roads[(int)direction] && !HasStreamThroughEdge(direction) &&
+			GetElevationDifference(direction) <= HexMetrics.ROAD_ELEVATION_DIFFERENCE_THRESHOLD
+		) {
+			SetRoad((int)direction, true);
+		}
+	}
+	public void RemoveRoads () {
+		for (int i = 0; i < neighbours.Length; i++) {
+			if (roads[i]) {
+				SetRoad(i, false);
+			}
+		}
+	}
+	void SetRoad (int index, bool state) {
+		roads[index] = state;
+		neighbours[index].roads[(int)((HexDirection)index).Opposite()] = state;
+		neighbours[index].RefreshSelfOnly();
+		RefreshSelfOnly();
+	}
+
+	/*
+	REFRESH
+	*/
 	void Refresh () {
 		if (chunk) {
 			chunk.Refresh();

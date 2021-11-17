@@ -14,7 +14,7 @@ public class HexMapEditor : MonoBehaviour
 	bool applyElevation = true;
 	bool applyWaterLevel = true;
 	int brushSize;
-	OptionalToggle streamMode;
+	OptionalToggle streamMode, roadMode;
 	bool isDrag;
 	HexDirection dragDirection;
 	HexCell previousCell;
@@ -102,6 +102,9 @@ public class HexMapEditor : MonoBehaviour
 	public void SetStreamMode (int mode) {
 		streamMode = (OptionalToggle)mode;
 	}
+	public void SetRoadMode (int mode) {
+		roadMode = (OptionalToggle)mode;
+	}
 	public void SelectLabelMode (int index) 
     {
 		hexGrid.SelectLabelMode(index);
@@ -141,10 +144,18 @@ public class HexMapEditor : MonoBehaviour
 			if (streamMode == OptionalToggle.No) {
 				cell.RemoveStream();
 			}
-			else if (isDrag && streamMode == OptionalToggle.Yes) {
+			if (roadMode == OptionalToggle.No) {
+				cell.RemoveRoads();
+			}
+			if (isDrag) {
 				HexCell otherCell = cell.GetNeighbour(dragDirection.Opposite());
 				if (otherCell) {
-					otherCell.SetOutgoingStream(dragDirection);
+					if (streamMode == OptionalToggle.Yes) {
+						otherCell.SetOutgoingStream(dragDirection);
+					}
+					if (roadMode == OptionalToggle.Yes) {
+						otherCell.AddRoad(dragDirection);
+					}
 				}
 			}
 		}
