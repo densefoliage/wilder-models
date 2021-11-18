@@ -6,6 +6,9 @@ Shader "Custom/RoadShader"
         _MainTex ("Albedo (RGB)", 2D) = "white" {}
         _Glossiness ("Smoothness", Range(0,1)) = 0.5
         _Metallic ("Metallic", Range(0,1)) = 0.0
+        _Blend_Min ("Blend Minium", Range(0,0.5)) = 0.4
+        _Blend_Max ("Blend Maximum", Range(0.5,1)) = 0.7
+        _Noise_Scale ("Noise Scale", Range(0.01,1)) = 0.125
     }
     SubShader
     {
@@ -18,7 +21,8 @@ Shader "Custom/RoadShader"
 
         CGPROGRAM
         // Physically based Standard lighting model, and enable shadows on all light types
-        #pragma surface surf Standard fullforwardshadows
+        // decal:blend for alpha blending
+        #pragma surface surf Standard fullforwardshadows decal:blend
 
         // Use shader model 3.0 target, to get nicer looking lighting
         #pragma target 3.0
@@ -28,11 +32,15 @@ Shader "Custom/RoadShader"
         struct Input
         {
             float2 uv_MainTex;
+            float3 worldPos;
         };
 
         half _Glossiness;
         half _Metallic;
         fixed4 _Color;
+        half _Blend_Min;
+        half _Blend_Max;
+        half _Noise_Scale;
 
         // Add instancing support for this shader. You need to check 'Enable Instancing' on materials that use the shader.
         // See https://docs.unity3d.com/Manual/GPUInstancing.html for more information about instancing.
@@ -43,13 +51,18 @@ Shader "Custom/RoadShader"
 
         void surf (Input IN, inout SurfaceOutputStandard o)
         {
+            float4 noise = tex2D(_MainTex, IN.worldPos.xz * _Noise_Scale);
             // Albedo comes from a texture tinted by color
-            fixed4 c = fixed4(IN.uv_MainTex, 1, 1);
+            fixed4 c = _Color * (noise.y * 0.5 + 0.5);
+			float blend = IN.uv_MainTex.x;
+            blend *= noise.x + 0.5;
+			blend = smoothstep(_Blend_Min, _Blend_Max, blend);
+
             o.Albedo = c.rgb;
             // Metallic and smoothness come from slider variables
             o.Metallic = _Metallic;
             o.Smoothness = _Glossiness;
-            o.Alpha = c.a;
+            o.Alpha = blend;
         }
         ENDCG
     }

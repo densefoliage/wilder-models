@@ -56,7 +56,7 @@ public class HexCell : MonoBehaviour
 			) {
 				RemoveIncomingStream();
 			}
-			
+
 			for (int i = 0; i < roads.Length; i++) {
 				if (roads[i] && GetElevationDifference((HexDirection)i) > 1) {
 					SetRoad(i, false);
@@ -261,6 +261,11 @@ public class HexCell : MonoBehaviour
 		neighbour.incomingStream = direction.Opposite();
 
 		SetRoad((int)direction, false);
+	}
+	public HexDirection StreamBeginOrEndDirection {
+		get {
+			return hasIncomingStream ? incomingStream : outgoingStream;
+		}
 	}
 
 

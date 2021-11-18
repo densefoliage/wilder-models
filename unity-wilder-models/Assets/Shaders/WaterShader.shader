@@ -1,4 +1,4 @@
-Shader "Custom/StreamShader"
+Shader "Custom/WaterShader"
 {
     Properties
     {
@@ -13,7 +13,7 @@ Shader "Custom/StreamShader"
     {
         // Next, switch the shader to transparent mode. 
         // We have to use shader tags to indicate this:
-        Tags { "RenderType"="Transparent" "Queue"="Transparent+1" }
+        Tags { "RenderType"="Transparent" "Queue"="Transparent" }
         LOD 200
 
         CGPROGRAM
@@ -49,23 +49,11 @@ Shader "Custom/StreamShader"
 
         void surf (Input IN, inout SurfaceOutputStandard o)
         {
-			float2 uv = IN.uv_MainTex;
-			uv.x = uv.x * _X_Scale + (_Time.y * _TimeFactor * 0.05);
-			uv.y -= _Time.y * _TimeFactor;
-			float4 noise = tex2D(_MainTex, uv);
-			
-			float2 uv2 = IN.uv_MainTex;
-			uv2.x = uv2.x * _X_Scale - (_TimeFactor * 0.95 * 0.05);
-			uv2.y -= _Time.y * (_TimeFactor * 0.95);
-			float4 noise2 = tex2D(_MainTex, uv2);
-			
-			fixed4 c = saturate(_Color + noise.r * noise2.a);
-            o.Albedo = c.rgb;
-
-            // Metallic and smoothness come from slider variables
-            o.Metallic = _Metallic;
-            o.Smoothness = _Glossiness;
-            o.Alpha = c.a;
+			fixed4 c = _Color;
+			o.Albedo = c.rgb;
+			o.Metallic = _Metallic;
+			o.Smoothness = _Glossiness;
+			o.Alpha = c.a;
         }
         ENDCG
     }

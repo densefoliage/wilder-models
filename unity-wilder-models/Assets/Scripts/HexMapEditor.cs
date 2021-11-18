@@ -139,6 +139,11 @@ public class HexMapEditor : MonoBehaviour
 				cell.Elevation = activeElevation;
 			}
 			if (applyWaterLevel) {
+				/*
+				This looks crazy when adjacent submerged cells have different 
+				water levels.
+				TO DO: FIX THIS!
+				*/
 				cell.WaterLevel = activeWaterLevel;
 			}
 			if (streamMode == OptionalToggle.No) {
