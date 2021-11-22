@@ -5,6 +5,8 @@ using UnityEngine;
 public static class HexMetrics
 {
     public static Texture2D noiseSource;
+    public static Color[] colors;
+
     private const float ROOT_3_DIV_2 = 0.86602540378f; // sqrt(3)/2
     public const float OUTER_TO_INNER = ROOT_3_DIV_2;
     public const float INNER_TO_OUTER = 1f / OUTER_TO_INNER;
@@ -13,6 +15,8 @@ public static class HexMetrics
     public const float OUTER_RADIUS = INNER_RADIUS * INNER_TO_OUTER;
     public const float SOLID_FACTOR = 0.8f;
     public const float BLEND_FACTOR = 1f - SOLID_FACTOR;
+    public const float WATER_FACTOR = 0.6f;
+    public const float WATER_BLEND_FACTOR = 1f - WATER_FACTOR;
     public const float ELEVATION_FACTOR = 0.5f;
     public const int TERRACES_PER_SLOPE = 2;
     public const int TERRACE_STEPS = TERRACES_PER_SLOPE * 2 + 1;
@@ -130,4 +134,14 @@ public static class HexMetrics
         position.z += (sample.z * 2f - 1f) * CELL_PERTURB_FACTOR;
         return position;
     }
+	public static Vector3 GetFirstWaterCorner (HexDirection direction) {
+		return GetCorner((int)direction) * WATER_FACTOR;
+	}
+	public static Vector3 GetSecondWaterCorner (HexDirection direction) {
+		return GetCorner((int)direction + 1) * WATER_FACTOR;
+	}
+	public static Vector3 GetWaterBridge (HexDirection direction) {
+		return (GetCorner((int)direction) + GetCorner((int)direction + 1)) *
+			WATER_BLEND_FACTOR;
+	}
 }

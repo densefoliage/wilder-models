@@ -30,5 +30,5 @@ Material:
     - _TimeFactor: 0.125
     - _X_Scale: 0.1
     m_Colors:
-    - _Color: {r: 0, g: 0.07796383, b: 1, a: 0.5019608}
+    - _Color: {r: 0, g: 0.078431375, b: 1, a: 0.5019608}
   m_BuildTextureStacks: []

@@ -9,14 +9,7 @@ public class HexCell : MonoBehaviour
     public int index;
 	public Color Color {
 		get {
-			return color;
-		}
-		set {
-			if (color == value) {
-				return;
-			}
-			color = value;
-			Refresh();
+			return HexMetrics.colors[terrainTypeIndex];
 		}
 	}
     public float Elevation 
@@ -44,18 +37,7 @@ public class HexCell : MonoBehaviour
 			uiPosition.z = -position.y;
 			uiRect.localPosition = uiPosition;
 
-			if (
-				hasOutgoingStream &&
-				elevation < GetNeighbour(outgoingStream).elevation
-			) {
-				RemoveOutgoingStream();
-			}
-			if (
-				hasIncomingStream &&
-				elevation > GetNeighbour(incomingStream).elevation
-			) {
-				RemoveIncomingStream();
-			}
+			ValidateStreams();
 
 			for (int i = 0; i < roads.Length; i++) {
 				if (roads[i] && GetElevationDifference((HexDirection)i) > 1) {
@@ -89,6 +71,7 @@ public class HexCell : MonoBehaviour
 				return;
 			}
 			waterLevel = value;
+			ValidateStreams();
 			Refresh();
 		}
 	}
@@ -118,6 +101,17 @@ public class HexCell : MonoBehaviour
 				HexMetrics.ELEVATION_FACTOR;
 		}
 	}
+	public int TerrainTypeIndex {
+		get {
+			return terrainTypeIndex;
+		}
+		set {
+			if (terrainTypeIndex != value) {
+				terrainTypeIndex = value;
+				Refresh();
+			}
+		}
+	}
     public RectTransform uiRect;
     public HexGridChunk chunk;
 
@@ -127,7 +121,7 @@ public class HexCell : MonoBehaviour
 	[SerializeField]
 	bool[] roads;
 
-    Color color;
+    int terrainTypeIndex;
     float elevation = int.MinValue;
     Text label;
     float waterLevel;
@@ -244,7 +238,7 @@ public class HexCell : MonoBehaviour
 		}
 
 		HexCell neighbour = GetNeighbour(direction);
-		if (!neighbour || elevation < neighbour.elevation) {
+		if (!IsValidStreamDestination(neighbour)) {
 			return;
 		}
 
@@ -267,7 +261,25 @@ public class HexCell : MonoBehaviour
 			return hasIncomingStream ? incomingStream : outgoingStream;
 		}
 	}
-
+	bool IsValidStreamDestination (HexCell neighbour) {
+		return neighbour && (
+			elevation >= neighbour.elevation || waterLevel == neighbour.elevation
+		);
+	}
+	void ValidateStreams () {
+		if (
+			hasOutgoingStream &&
+			!IsValidStreamDestination(GetNeighbour(outgoingStream))
+		) {
+			RemoveOutgoingStream();
+		}
+		if (
+			hasIncomingStream &&
+			!GetNeighbour(incomingStream).IsValidStreamDestination(this)
+		) {
+			RemoveIncomingStream();
+		}
+	}
 
 	/*
 	ROADS

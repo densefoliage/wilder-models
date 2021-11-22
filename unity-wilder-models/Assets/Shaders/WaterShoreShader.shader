@@ -1,4 +1,4 @@
-Shader "Custom/WaterShader"
+Shader "Custom/WaterShoreShader"
 {
     Properties
     {
@@ -46,9 +46,12 @@ Shader "Custom/WaterShader"
 
         void surf (Input IN, inout SurfaceOutputStandard o)
         {
-            float waves = Waves(IN.worldPos.xz, _MainTex);
+			float shore = IN.uv_MainTex.y;
+			float foam = Foam(shore, IN.worldPos.xz, _MainTex);
+			float waves = Waves(IN.worldPos.xz, _MainTex);
+			waves *= 1 - shore;
 
-			fixed4 c = saturate(_Color + waves);
+			fixed4 c = saturate(_Color + max(foam, waves));
 			o.Albedo = c.rgb;
 			o.Metallic = _Metallic;
 			o.Smoothness = _Glossiness;

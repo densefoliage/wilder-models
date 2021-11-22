@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: WaterShaderMat
-  m_Shader: {fileID: 4800000, guid: 526b02932d135494c9826c2d61b08397, type: 3}
+  m_Name: EstuaryShaderMat
+  m_Shader: {fileID: 4800000, guid: 98dac5ad37e0c44c5bfc27a6865aee5a, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -33,5 +33,5 @@ Material:
     - _TimeFactor: 0.125
     - _X_Scale: 0.1
     m_Colors:
-    - _Color: {r: 0, g: 0.07796383, b: 1, a: 0.5019608}
+    - _Color: {r: 0, g: 0.078431375, b: 1, a: 0.5019608}
   m_BuildTextureStacks: []
