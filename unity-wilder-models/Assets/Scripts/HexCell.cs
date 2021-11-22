@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -19,18 +20,7 @@ public class HexCell : MonoBehaviour
 				return;
 			}
             elevation = value;
-            Vector3 position = transform.localPosition;
-            /*
-            Should this happen here, or when the mesh is constructed? Otherwise, heights
-            don't change when the ELEVATION_PERTURB_FACTOR changes...
-            */
-            position.y = value * HexMetrics.ELEVATION_FACTOR;
-            position.y +=
-				(HexMetrics.SampleNoise(position).y * 2f - 1f) * HexMetrics.ELEVATION_PERTURB_FACTOR;
-            transform.localPosition = position;
-            Vector3 uiPosition = uiRect.localPosition;
-			uiPosition.z = -position.y;
-			uiRect.localPosition = uiPosition;
+			RefreshPosition();
 
 			ValidateStreams();
 
@@ -161,6 +151,16 @@ public class HexCell : MonoBehaviour
 	public float GetElevationDifference (HexDirection direction) {
 		float difference = elevation - GetNeighbour(direction).elevation;
 		return difference >= 0 ? difference : -difference;
+	}
+	void RefreshPosition () {
+		Vector3 position = transform.localPosition;
+		position.y = elevation * HexMetrics.ELEVATION_FACTOR;
+		position.y +=
+			(HexMetrics.SampleNoise(position).y * 2f - 1f) * HexMetrics.ELEVATION_PERTURB_FACTOR;
+		transform.localPosition = position;
+		Vector3 uiPosition = uiRect.localPosition;
+		uiPosition.z = -position.y;
+		uiRect.localPosition = uiPosition;
 	}
 
 	/*
@@ -329,5 +329,70 @@ public class HexCell : MonoBehaviour
 	}
 	void RefreshSelfOnly () {
 		chunk.Refresh();
+	}
+
+	/*
+	SAVE AND LOAD
+	https://catlikecoding.com/unity/tutorials/hex-map/part-12/
+	*/
+	public void Save (BinaryWriter writer) {
+
+		/*
+		Terrain
+		*/
+		writer.Write((byte)terrainTypeIndex);
+		writer.Write(elevation);
+		writer.Write(waterLevel);
+
+		/*
+		Streams
+		This can be compressed, but it's okay for now.
+		*/
+		writer.Write(hasIncomingStream);
+		writer.Write((byte)incomingStream);
+
+		writer.Write(hasOutgoingStream);
+		writer.Write((byte)outgoingStream);
+
+		/*
+		Roads
+		*/
+		int roadFlags = 0;
+		for (int i = 0; i < roads.Length; i++) {
+			if (roads[i]) {
+				roadFlags |= 1 << i;
+			}
+		}
+		writer.Write((byte)roadFlags);
+	}
+
+	public void Load (BinaryReader reader) {
+
+		/*
+		Terrain
+		*/
+		terrainTypeIndex = reader.ReadByte();
+
+		elevation = reader.ReadSingle();
+		RefreshPosition();
+		waterLevel = reader.ReadSingle();
+
+		/*
+		Streams
+		*/
+		hasIncomingStream = reader.ReadBoolean();
+		incomingStream = (HexDirection)reader.ReadByte();
+
+		hasOutgoingStream = reader.ReadBoolean();
+		outgoingStream = (HexDirection)reader.ReadByte();
+
+		/*
+		Roads
+		*/
+		int roadFlags = reader.ReadByte();
+		for (int i = 0; i < roads.Length; i++) {
+			roads[i] = (roadFlags & (1 << i)) != 0;
+		}
+
 	}
 }
