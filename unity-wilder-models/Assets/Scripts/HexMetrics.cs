@@ -5,7 +5,6 @@ using UnityEngine;
 public static class HexMetrics
 {
     public static Texture2D noiseSource;
-    public static Color[] colors;
 
     private const float ROOT_3_DIV_2 = 0.86602540378f; // sqrt(3)/2
     public const float OUTER_TO_INNER = ROOT_3_DIV_2;
