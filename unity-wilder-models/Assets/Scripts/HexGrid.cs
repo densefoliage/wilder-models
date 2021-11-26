@@ -1,17 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class HexGrid : MonoBehaviour
 {
-    public int chunkCountX = 4, chunkCountZ = 3;
+    public int cellCountX = 20, cellCountZ = 15;
     public HexGridChunk chunkPrefab;
     public HexCell cellPrefab;
     public Text cellLabelPrefab;
     public Texture2D noiseSource;
-
-    int cellCountX, cellCountZ;
+    int chunkCountX, chunkCountZ;
     HexGridChunk[] chunks;
     HexCell[] cells;
     Text[] labels;
@@ -27,12 +27,35 @@ public class HexGrid : MonoBehaviour
     {
         HexMetrics.noiseSource = noiseSource;
         // HexMetrics.InitializeHashGrid(seed);
+		CreateMap(cellCountX, cellCountZ);
+	}
 
-		cellCountX = chunkCountX * HexMetrics.CHUNK_SIZE_X;
-		cellCountZ = chunkCountZ * HexMetrics.CHUNK_SIZE_Z;
+	public bool CreateMap (int x, int z) {
+
+		if (
+			x <= 0 || x % HexMetrics.CHUNK_SIZE_X != 0 ||
+			z <= 0 || z % HexMetrics.CHUNK_SIZE_Z != 0
+		) {
+			Debug.LogError("Unsupported map size.");
+			return false;
+		}
+
+		if (chunks != null) {
+			for (int i = 0; i < chunks.Length; i++) {
+				Destroy(chunks[i].gameObject);
+			}
+		}
+
+        cellCountX = x;
+		cellCountZ = z;
+
+		chunkCountX = cellCountX / HexMetrics.CHUNK_SIZE_X;
+		chunkCountZ = cellCountZ / HexMetrics.CHUNK_SIZE_Z;
 
         CreateChunks();
 		CreateCells();
+
+        return true;
     }
 	void OnEnable () {
 		if (!HexMetrics.noiseSource) {
@@ -191,4 +214,44 @@ public class HexGrid : MonoBehaviour
             chunk.SetLabelMode(labelModes[activeLabelModeIndex]);
         }
     }
+
+	/*
+	SAVE AND LOAD
+	*/
+	public void Save (BinaryWriter writer) {
+		writer.Write(cellCountX);
+		writer.Write(cellCountZ);
+
+		for (int i = 0; i < cells.Length; i++) {
+			cells[i].Save(writer);
+		}
+	}
+
+	public void Load (BinaryReader reader, int header) {
+		int x = 20, z = 15;
+		if (header >= 1) {
+			x = reader.ReadInt32();
+			z = reader.ReadInt32();
+		}
+
+		if (x != cellCountX || z != cellCountZ) {
+            /*
+            If map to load is the same size as current map
+            we can skip creating a new map.
+            */
+			if (!CreateMap(x, z)) {
+                /*
+                If map creation fails, abort loading
+                */
+				return;
+			}
+		}
+
+		for (int i = 0; i < cells.Length; i++) {
+			cells[i].Load(reader);
+		}
+		for (int i = 0; i < chunks.Length; i++) {
+			chunks[i].Refresh();
+		}
+	}
 }

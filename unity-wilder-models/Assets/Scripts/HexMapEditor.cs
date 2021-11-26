@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -153,6 +154,39 @@ public class HexMapEditor : MonoBehaviour
 						otherCell.AddRoad(dragDirection);
 					}
 				}
+			}
+		}
+	}
+	public void Save () {
+		string path = Path.Combine(Application.persistentDataPath, "test.map");
+		Debug.Log("SAVE: " + path);
+
+		using (
+			BinaryWriter writer =
+				new BinaryWriter(File.Open(path, FileMode.Create))
+		) {
+			writer.Write(1);
+			hexGrid.Save(writer);
+		}
+	}
+
+	public void Load () {
+		string path = Path.Combine(Application.persistentDataPath, "test.map");
+		Debug.Log("LOAD: " + path);
+
+		using (
+			BinaryReader reader =
+				new BinaryReader(File.OpenRead(path))
+		) {
+			int header = reader.ReadInt32();
+			if (header <= 1) {
+				/*
+				This is save format 0
+				*/
+				hexGrid.Load(reader, header);
+			}
+			else {
+				Debug.LogWarning("Unknown map format " + header);
 			}
 		}
 	}
