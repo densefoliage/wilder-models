@@ -11,6 +11,7 @@ public class HexGrid : MonoBehaviour
     public HexCell cellPrefab;
     public Text cellLabelPrefab;
     public Texture2D noiseSource;
+    public LoadCSV loadCSV;
     int chunkCountX, chunkCountZ;
     HexGridChunk[] chunks;
     HexCell[] cells;
@@ -29,6 +30,74 @@ public class HexGrid : MonoBehaviour
         // HexMetrics.InitializeHashGrid(seed);
 		CreateMap(cellCountX, cellCountZ);
 	}
+
+    public bool CreateMap (int x, int z, string fileName) {
+
+		if (
+			x <= 0 || x % HexMetrics.CHUNK_SIZE_X != 0 ||
+			z <= 0 || z % HexMetrics.CHUNK_SIZE_Z != 0
+		) {
+			Debug.LogError("Unsupported map size.");
+			return false;
+		}
+
+        List<HexDatum> data = loadCSV.LoadHexData(fileName);
+
+        if (
+            x * z != data.Count
+        ) {
+            Debug.LogError("Map size doesn't match data! m: " + (x * z) + " d: " + data.Count);
+            loadCSV.ClearHexData();
+
+			return false;
+        }
+
+		if (chunks != null) {
+			for (int i = 0; i < chunks.Length; i++) {
+				Destroy(chunks[i].gameObject);
+			}
+		}
+
+        cellCountX = x;
+		cellCountZ = z;
+
+		chunkCountX = cellCountX / HexMetrics.CHUNK_SIZE_X;
+		chunkCountZ = cellCountZ / HexMetrics.CHUNK_SIZE_Z;
+
+        CreateChunks();
+		CreateCells();
+
+        for (int i = 0; i < cells.Length; i++)
+        {   
+            HexCell cell = cells[i];
+            HexDatum datum = data[i];
+
+            if ( datum.IsWater || datum.IsRoad ) {
+                cell.Elevation = datum.TerrainElevation;
+            } else {
+                cell.Elevation = datum.SurfaceElevation;
+            }
+
+            if ( datum.IsWater ) {
+                cell.TerrainTypeIndex = 3; // STONE
+                cell.WaterLevel = 22.66f;
+            }
+            else if ( datum.IsRoad ) {
+                cell.TerrainTypeIndex = 2; // MUD
+            }
+            else if ( datum.TerrainSlope > 25 ) {
+                cell.TerrainTypeIndex = 3; // STONE
+            }
+            else if ( datum.IsForest || datum.IsHedge || datum.HasSurfaceFeature ) {
+                cell.TerrainTypeIndex = 3; // STONE
+            }
+            else {
+                cell.TerrainTypeIndex = 1; // GRASS
+            }
+        }
+
+        return true;
+    }
 
 	public bool CreateMap (int x, int z) {
 

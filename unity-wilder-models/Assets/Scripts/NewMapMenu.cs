@@ -17,18 +17,6 @@ public class NewMapMenu : MonoBehaviour
 	public void CreateLargeMap () {
 		CreateMap(80, 60);
 	}
-
-	public void CreateMapFromData() {
-		Debug.Log("CREATE MAP FROM DATA");
-		Debug.Log(Application.dataPath);
-		string path = Application.dataPath + "/Data/ewzClip.xlsx";
-		if (File.Exists(path)) {
-			Debug.Log("Loading file at: " + path);
-			// Excel xls =  ExcelHelper.LoadExcel(path);
-
-			return;
-		}
-	}
 	public void Open () {
 		gameObject.SetActive(true);
         HexMapCamera.Locked = true;

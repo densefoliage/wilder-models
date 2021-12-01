@@ -86,6 +86,13 @@ public class HexCell : MonoBehaviour
 				HexMetrics.ELEVATION_FACTOR;
 		}
 	}
+	/*
+		0 -> SAND
+		1 -> GRASS
+		2 -> MUD
+		3 -> STONE
+		4 -> SNOW
+	*/
 	public int TerrainTypeIndex {
 		get {
 			return terrainTypeIndex;

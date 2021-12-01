@@ -12,22 +12,23 @@ public static class HexMetrics
     private const float PI = Mathf.PI;
     public const float INNER_RADIUS = 1f;
     public const float OUTER_RADIUS = INNER_RADIUS * INNER_TO_OUTER;
-    public const float SOLID_FACTOR = 0.8f;
+    public const float SOLID_FACTOR = 0.5f;
     public const float BLEND_FACTOR = 1f - SOLID_FACTOR;
     public const float WATER_FACTOR = 0.6f;
     public const float WATER_BLEND_FACTOR = 1f - WATER_FACTOR;
-    public const float ELEVATION_FACTOR = 0.5f;
-    public const int TERRACES_PER_SLOPE = 2;
+    public const float ELEVATION_FACTOR = 1f;
+    public const int TERRACES_PER_SLOPE = 0;
     public const int TERRACE_STEPS = TERRACES_PER_SLOPE * 2 + 1;
     public const float HORIZONTAL_TERRACE_STEP_SIZE = 1f / TERRACE_STEPS;
     public const float VERTICAL_TERRACE_STEP_SIZE = 1f / (TERRACES_PER_SLOPE+1);
     public const float STEEP_THRESHOLD = 2f;
     public const float CELL_PERTURB_FACTOR = 1f;
-    public const float ELEVATION_PERTURB_FACTOR = 0.125f;
+    public const float ELEVATION_PERTURB_FACTOR = 0f;
     public const float NOISE_SCALE = 0.01f;
     public const int CHUNK_SIZE_X = 5, CHUNK_SIZE_Z = 5;
+    public const int MAX_CHUNKS = 10000;
     public const float STREAM_BED_ELEVATION_OFFSET = -1f;
-    public const float WATER_ELEVATION_OFFSET = -0.5f;
+    public const float WATER_ELEVATION_OFFSET = -0.25f;
     public const float ROAD_ELEVATION_DIFFERENCE_THRESHOLD = 1f;
 
     /*
