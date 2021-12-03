@@ -12,6 +12,7 @@ public class HexGrid : MonoBehaviour
     public Text cellLabelPrefab;
     public Texture2D noiseSource;
     public LoadCSV loadCSV;
+    public HexMapCamera cameraRig;
     int chunkCountX, chunkCountZ;
     HexGridChunk[] chunks;
     HexCell[] cells;
@@ -67,6 +68,9 @@ public class HexGrid : MonoBehaviour
         CreateChunks();
 		CreateCells();
 
+        int numWaterCells = 0;
+        float waterLevel = 0f;
+
         for (int i = 0; i < cells.Length; i++)
         {   
             HexCell cell = cells[i];
@@ -78,22 +82,68 @@ public class HexGrid : MonoBehaviour
                 cell.Elevation = datum.SurfaceElevation;
             }
 
-            if ( datum.IsWater ) {
-                cell.TerrainTypeIndex = 3; // STONE
-                cell.WaterLevel = 22.66f;
+            if ( datum.IsRoad ) {
+                Debug.Log(datum.RoadType);
+                if ( datum.IsWater ) {
+                    // BRIDGE
+                    cell.TerrainTypeIndex = 5; // CONCRETE
+                } else if ( datum.RoadType == "road" ) {
+                    cell.TerrainTypeIndex = 4; // TARMAC PATH
+                } else if ( datum.RoadType == "track" ) {
+                    cell.TerrainTypeIndex = 5; // CONCRETE
+                } else if ( datum.IsForest || datum.IsHedge ) {
+                    cell.TerrainTypeIndex = 3; // MUD PATH
+                } else {
+                    cell.TerrainTypeIndex = 2; // GRASS PATH
+                }
+
+            } else if ( datum.IsWater ) {
+                numWaterCells++;
+                waterLevel += datum.TerrainElevation;
+                cell.TerrainTypeIndex = 1; // MUD
+                cell.Elevation -= 1f ;
+
+            } else if ( datum.IsForest ) {
+                Debug.Log(datum.LandCover);
+                if ( datum.LandCover == "deciduous woodland" ) {
+                    cell.TerrainTypeIndex = 8; // LIGHT FOREST
+                } else if ( datum.LandCover == "coniferous woodland" ) {
+                    cell.TerrainTypeIndex = 8; // DARK FOREST
+                } else {
+                    cell.TerrainTypeIndex = 8; // LIGHT FOREST
+                }
+                if ( !datum.IsWater ) {
+                    cell.Elevation += 2;
+                }
+            } else if ( datum.IsHedge ) {
+                cell.TerrainTypeIndex = 7; // HEDGE
+                cell.Elevation += 2;
+            } else if ( datum.LandCover == "urban" || datum.LandCover == "suburban" ) {
+                if ( datum.HasSurfaceFeature ) {
+                    cell.TerrainTypeIndex = 6; // BRICK
+                } else { 
+                    cell.TerrainTypeIndex = 5; // CONCRETE
+                }
+            } else {
+                if ( datum.HasSurfaceFeature ) {
+                    cell.TerrainTypeIndex = 7; // HEDGE
+                }
+                else if ( datum.TerrainSlope > 20 ) {
+                    cell.TerrainTypeIndex = 1; // MUD
+                }
+                 else {
+                    cell.TerrainTypeIndex = 0; // GRASS
+                }
             }
-            else if ( datum.IsRoad ) {
-                cell.TerrainTypeIndex = 2; // MUD
-            }
-            else if ( datum.TerrainSlope > 25 ) {
-                cell.TerrainTypeIndex = 3; // STONE
-            }
-            else if ( datum.IsForest || datum.IsHedge || datum.HasSurfaceFeature ) {
-                cell.TerrainTypeIndex = 3; // STONE
-            }
-            else {
-                cell.TerrainTypeIndex = 1; // GRASS
-            }
+        }
+
+        waterLevel = waterLevel / numWaterCells;
+        Debug.Log(waterLevel);
+
+        for (int i = 0; i < cells.Length; i++) {
+            HexCell cell = cells[i];
+
+            cell.WaterLevel = waterLevel;
         }
 
         return true;
@@ -294,6 +344,8 @@ public class HexGrid : MonoBehaviour
 		for (int i = 0; i < cells.Length; i++) {
 			cells[i].Save(writer);
 		}
+
+        cameraRig.Save(writer);
 	}
 
 	public void Load (BinaryReader reader, int header) {
@@ -322,5 +374,10 @@ public class HexGrid : MonoBehaviour
 		for (int i = 0; i < chunks.Length; i++) {
 			chunks[i].Refresh();
 		}
+
+        if (header >= 2) {
+            // Load camera position
+            cameraRig.Load(reader);
+        }
 	}
 }

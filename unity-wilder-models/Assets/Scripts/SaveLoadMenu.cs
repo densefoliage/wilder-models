@@ -13,6 +13,7 @@ public class SaveLoadMenu : MonoBehaviour
 	public RectTransform listContent;
 	public SaveLoadItem itemPrefab;
     bool saveMode;
+	int saveHeaderLatest = 2;
 
     // Start is called before the first frame update
     void Start()
@@ -60,7 +61,7 @@ public class SaveLoadMenu : MonoBehaviour
 			BinaryWriter writer =
 			new BinaryWriter(File.Open(path, FileMode.Create))
 		) {
-			writer.Write(1);
+			writer.Write(saveHeaderLatest);
 			hexGrid.Save(writer);
 		}
 	}
@@ -73,7 +74,7 @@ public class SaveLoadMenu : MonoBehaviour
 
 		using (BinaryReader reader = new BinaryReader(File.OpenRead(path))) {
 			int header = reader.ReadInt32();
-			if (header <= 1) {
+			if (header <= saveHeaderLatest) {
 				hexGrid.Load(reader, header);
 				HexMapCamera.ValidatePosition();
 			}

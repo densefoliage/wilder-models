@@ -11,7 +11,7 @@ Material:
   m_Shader: {fileID: 4800000, guid: 5553d6e79a44c465fa534ce432953741, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
+  m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
   stringTagMap: {}
@@ -20,14 +20,14 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _MainTex:
-        m_Texture: {fileID: 18700000, guid: c71d5da2f84f94c6c9600d1fa5daf2b9, type: 2}
+        m_Texture: {fileID: 18700000, guid: eeac165a9e30444c6b763eaae8f04b53, type: 2}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
     - _Glossiness: 0
     - _Metallic: 0
-    - _TextureScale: 0.02
+    - _TextureScale: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []

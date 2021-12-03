@@ -7,16 +7,17 @@ using UnityEngine.EventSystems;
 public class HexMapEditor : MonoBehaviour
 {
 	public HexGrid hexGrid;
-	int activeTerrainTypeIndex;
+	int activeTerrainTypeIndex = -1;
 	float activeElevation;
-	float activeWaterLevel;
+	float activeWaterLevel, calcWaterLevel;
 	bool applyColor;
 	bool applyElevation = true;
 	bool applyWaterLevel = true;
 	int brushSize;
 	OptionalToggle streamMode, roadMode;
-	bool isDrag;
+	bool inputHeld, isValidDrag;
 	HexDirection dragDirection;
+	int previousDragDirection;
 	HexCell previousCell;
 
     // Start is called before the first frame update
@@ -33,7 +34,9 @@ public class HexMapEditor : MonoBehaviour
 			HandleInput();
 		}
 		else {
+			inputHeld = false;
 			previousCell = null;
+			previousDragDirection = -1;
 		}
 	}
 
@@ -47,9 +50,11 @@ public class HexMapEditor : MonoBehaviour
 				ValidateDrag(currentCell);
 			}
 			else {
-				isDrag = false;
+				isValidDrag = false;
 			}
 			EditCells(currentCell);
+
+			inputHeld = true;
 			previousCell = currentCell;
 		}
 		else {
@@ -63,7 +68,15 @@ public class HexMapEditor : MonoBehaviour
 			dragDirection++
 		) {
 			if (previousCell.GetNeighbour(dragDirection) == currentCell) {
-				isDrag = true;
+				if (previousDragDirection != -1 && previousDragDirection == (int)dragDirection.Opposite()) {
+					Debug.Log("INVALID DRAG");
+					isValidDrag = false;
+					previousDragDirection = (int)dragDirection;
+					return;
+				}
+				Debug.Log("VALID DRAG");
+				isValidDrag = true;
+				previousDragDirection = (int)dragDirection;
 				return;
 			}
 		}
@@ -72,10 +85,10 @@ public class HexMapEditor : MonoBehaviour
 		drag direction and preventing it from immediately going in the opposite
 		direction.
 		*/
-		isDrag = false;
+		isValidDrag = false;
 	}
 	public void SetTerrainTypeIndex (int index) {
-		activeTerrainTypeIndex = index;
+		activeTerrainTypeIndex = index - 1;
 	}
 	public void SetApplyElevation (bool toggle) {
 		applyElevation = toggle;
@@ -123,20 +136,23 @@ public class HexMapEditor : MonoBehaviour
 	}
 	void EditCell (HexCell cell) 
 	{
-		if (cell) {
+		if (cell && !inputHeld) {
+			// Triggers on first function call only!
+			calcWaterLevel = cell.WaterLevel + activeWaterLevel;
+		}
+		if (cell && ( !inputHeld || isValidDrag )) {
 			if (activeTerrainTypeIndex >= 0) {
 				cell.TerrainTypeIndex = activeTerrainTypeIndex;
 			}
 			if (applyElevation) {
-				cell.Elevation = activeElevation;
+				cell.Elevation += activeElevation;
 			}
 			if (applyWaterLevel) {
 				/*
-				This looks crazy when adjacent submerged cells have different 
-				water levels.
-				TO DO: FIX THIS!
+				Water level of cells edited when mouse held
+				will be the same as first cell edited.
 				*/
-				cell.WaterLevel = activeWaterLevel;
+				cell.WaterLevel = calcWaterLevel;
 			}
 			if (streamMode == OptionalToggle.No) {
 				cell.RemoveStream();
@@ -144,7 +160,7 @@ public class HexMapEditor : MonoBehaviour
 			if (roadMode == OptionalToggle.No) {
 				cell.RemoveRoads();
 			}
-			if (isDrag) {
+			if (isValidDrag) {
 				HexCell otherCell = cell.GetNeighbour(dragDirection.Opposite());
 				if (otherCell) {
 					if (streamMode == OptionalToggle.Yes) {

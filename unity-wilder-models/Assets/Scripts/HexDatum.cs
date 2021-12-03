@@ -136,10 +136,15 @@ public class HexDatum {
             return landCoverIndex;
         }
         set {
-            if (value <=1 && value >= 21) {
+            if (value >=1 && value <= 21) {
                 landCoverIndex = value;
                 landCover = LAND_COVER_TYPES[ value-1 ];
             }
+        }
+    }
+    public string LandCover {
+        get {
+            return landCover;
         }
     }
     [SerializeField]
@@ -228,27 +233,27 @@ public class HexDatum {
     string zoneName, roadType, waterType;
 
     static string[] LAND_COVER_TYPES = {
-        "Deciduous woodland",
-        "Coniferous woodland",
-        "Arable",
-        "Improved grassland",
-        "Neutral grassland",
-        "Calcareous grassland",
-        "Acid grassland",
-        "Fen",
-        "Heather",
-        "Heather grassland",
-        "Bog",
-        "Inland rock",
-        "Saltwater",
-        "Freshwater",
-        "Supralittoral rock",
-        "Supralittoral sediment",
-        "Littoral rock",
-        "Littoral sediment",
-        "Saltmarsh",
-        "Urban",
-        "Suburban"
+        "deciduous woodland",
+        "coniferous woodland",
+        "arable",
+        "improved grassland",
+        "neutral grassland",
+        "calcareous grassland",
+        "acid grassland",
+        "fen",
+        "heather",
+        "heather grassland",
+        "bog",
+        "inland rock",
+        "saltwater",
+        "freshwater",
+        "supralittoral rock",
+        "supralittoral sediment",
+        "littoral rock",
+        "littoral sediment",
+        "saltmarsh",
+        "urban",
+        "suburban"
     };
     static string[] VALID_ROAD_TYPES = {
         "footpath",

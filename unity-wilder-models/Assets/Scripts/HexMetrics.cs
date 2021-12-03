@@ -28,7 +28,7 @@ public static class HexMetrics
     public const int CHUNK_SIZE_X = 5, CHUNK_SIZE_Z = 5;
     public const int MAX_CHUNKS = 10000;
     public const float STREAM_BED_ELEVATION_OFFSET = -1f;
-    public const float WATER_ELEVATION_OFFSET = -0.25f;
+    public const float WATER_ELEVATION_OFFSET = -0.125f;
     public const float ROAD_ELEVATION_DIFFERENCE_THRESHOLD = 1f;
 
     /*
