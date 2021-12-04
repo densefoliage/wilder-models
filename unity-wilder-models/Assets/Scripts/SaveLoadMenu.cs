@@ -13,7 +13,7 @@ public class SaveLoadMenu : MonoBehaviour
 	public RectTransform listContent;
 	public SaveLoadItem itemPrefab;
     bool saveMode;
-	int saveHeaderLatest = 2;
+	int saveHeaderLatest = 3;
 
     // Start is called before the first frame update
     void Start()

@@ -26,7 +26,12 @@ public class HexMapCamera : MonoBehaviour
 		}
 	}
     Transform stick, swivel;
-	Camera cam;
+
+	public Camera Camera {
+		get {
+			return this.GetComponentInChildren<Camera>();
+		}
+	}
     float zoom = 0f;
     float rotationAngle;
 	void OnEnable () {
@@ -35,7 +40,6 @@ public class HexMapCamera : MonoBehaviour
 	void Awake () {
 		swivel = transform.GetChild(0);
 		stick = swivel.GetChild(0);
-		cam = stick.GetComponentInChildren< Camera >();
 
 		SetYOffset(yOffset);
         AdjustZoom(0);
@@ -133,8 +137,9 @@ public class HexMapCamera : MonoBehaviour
 	public static void ValidatePosition () {
 		instance.AdjustPosition(0f, 0f);
 	}
-	public static Camera GetCamera() {
-		return instance.cam;
+
+	public static Transform GetTransform() {
+		return instance.transform;
 	}
 	public void Save (BinaryWriter writer) {
 		/*

@@ -12,7 +12,8 @@ public class HexGrid : MonoBehaviour
     public Text cellLabelPrefab;
     public Texture2D noiseSource;
     public LoadCSV loadCSV;
-    public HexMapCamera cameraRig;
+    public HexMapCamera hexMapCamera;
+    public CameraManager cameraManager;
     int chunkCountX, chunkCountZ;
     HexGridChunk[] chunks;
     HexCell[] cells;
@@ -345,7 +346,7 @@ public class HexGrid : MonoBehaviour
 			cells[i].Save(writer);
 		}
 
-        cameraRig.Save(writer);
+        cameraManager.Save(writer);
 	}
 
 	public void Load (BinaryReader reader, int header) {
@@ -375,9 +376,11 @@ public class HexGrid : MonoBehaviour
 			chunks[i].Refresh();
 		}
 
-        if (header >= 2) {
+        if (header == 2) {
             // Load camera position
-            cameraRig.Load(reader);
+            hexMapCamera.Load(reader);
+        } else if (header == 3) {
+            cameraManager.Load(reader);
         }
 	}
 }
