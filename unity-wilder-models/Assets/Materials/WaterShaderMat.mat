@@ -22,7 +22,7 @@ Material:
     - _MainTex:
         m_Texture: {fileID: 2800000, guid: 972b3a4fdee5b4f158331cb7f1e5c32b, type: 3}
         m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
+        m_Offset: {x: 1, y: 0}
     m_Ints: []
     m_Floats:
     - _Blend_Max: 2
@@ -33,5 +33,5 @@ Material:
     - _TimeFactor: 0.125
     - _X_Scale: 0.1
     m_Colors:
-    - _Color: {r: 0.1412929, g: 0.08139017, b: 0.12156863, a: 0.7490196}
+    - _Color: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
   m_BuildTextureStacks: []
